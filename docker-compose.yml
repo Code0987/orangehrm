@@ -1,0 +1,31 @@
+version: "3.3"
+
+services:
+  mariadb:
+    image: mariadb:10.4
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=orangehrm
+      - MYSQL_ROOT_USER=root
+      - MYSQL_DATABASE=orangehrm
+    command: ["--wait_timeout=28800"]
+
+  orangehrm:
+    image: orangehrm/orangehrm:latest
+    restart: unless-stopped
+    ports:
+      - "8200:80"
+      - "8443:443"
+    environment:
+      - ORANGEHRM_DATABASE_HOST=mariadb
+      - ORANGEHRM_DATABASE_USER=root
+      - ORANGEHRM_DATABASE_PASSWORD=orangehrm
+      - ORANGEHRM_DATABASE_NAME=orangehrm
+      - PUID=998
+      - PGID=100
+    depends_on:
+      - mariadb
+    links:
+      - mariadb:mariadb
